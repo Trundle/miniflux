@@ -24,11 +24,14 @@ func (h *handler) showSearchEntryPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	entryID := request.RouteInt64Param(r, "entryID")
-	searchQuery := request.QueryStringParam(r, "q", "")
+	searchQuery, searchTags := parseQuery(request.QueryStringParam(r, "q", ""))
 	builder := h.store.NewEntryQueryBuilder(user.ID)
 	builder.WithSearchQuery(searchQuery)
 	builder.WithEntryID(entryID)
 	builder.WithoutStatus(model.EntryStatusRemoved)
+	if len(searchTags) > 0 {
+		builder.WithTags(searchTags)
+	}
 
 	entry, err := builder.GetEntry()
 	if err != nil {
@@ -71,7 +74,7 @@ func (h *handler) showSearchEntryPage(w http.ResponseWriter, r *http.Request) {
 
 	sess := session.New(h.store, request.SessionID(r))
 	view := view.New(h.tpl, r, sess)
-	view.Set("searchQuery", searchQuery)
+	view.Set("searchQuery", buildQuery(searchQuery, searchTags))
 	view.Set("entry", entry)
 	view.Set("prevEntry", prevEntry)
 	view.Set("nextEntry", nextEntry)

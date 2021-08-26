@@ -35,6 +35,7 @@ type Entry struct {
 	ShareCode   string        `json:"share_code"`
 	Starred     bool          `json:"starred"`
 	ReadingTime int           `json:"reading_time"`
+	Tags        []string      `json:"tags"`
 	Enclosures  EnclosureList `json:"enclosures"`
 	Feed        *Feed         `json:"feed,omitempty"`
 }

@@ -15,6 +15,12 @@
         </li>
         {{ end }}
     </ul>
+    <ul class="item-tags">
+        {{ range .entry.Tags }}
+        <li><a href="{{ route "searchEntries" }}?q=tag%3a{{ . | safeURL }}">{{ . }}</a></li>
+        {{ end }}
+        <li><a href="{{ route "showEditTagsPage" "entryID" .entry.ID }}">edit</a></li>
+    </ul>
     <ul class="item-meta-icons">
         <li>
             <a href="#"

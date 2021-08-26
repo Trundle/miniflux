@@ -153,6 +153,12 @@ func (e *EntryQueryBuilder) WithShareCodeNotEmpty() *EntryQueryBuilder {
 	return e
 }
 
+func (e *EntryQueryBuilder) WithTags(tags []string) *EntryQueryBuilder {
+	e.conditions = append(e.conditions, fmt.Sprintf("$%d <@ e.tags", len(e.args)+1))
+	e.args = append(e.args, pq.Array(tags))
+	return e
+}
+
 // WithOrder set the sorting order.
 func (e *EntryQueryBuilder) WithOrder(order string) *EntryQueryBuilder {
 	e.order = order
@@ -246,6 +252,7 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 			e.reading_time,
 			e.created_at,
 			e.changed_at,
+			e.tags,
 			f.title as feed_title,
 			f.feed_url,
 			f.site_url,
@@ -308,6 +315,7 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 			&entry.ReadingTime,
 			&entry.CreatedAt,
 			&entry.ChangedAt,
+			pq.Array(&entry.Tags),
 			&entry.Feed.Title,
 			&entry.Feed.FeedURL,
 			&entry.Feed.SiteURL,

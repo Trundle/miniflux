@@ -515,3 +515,12 @@ func (s *Storage) UnshareEntry(userID int64, entryID int64) (err error) {
 	}
 	return
 }
+
+func (s *Storage) UpdateTags(entry *model.Entry) (err error) {
+	query := `UPDATE entries SET tags=$1 WHERE id=$2`
+	_, err = s.db.Exec(query, pq.Array(entry.Tags), entry.ID)
+	if err != nil {
+		err = fmt.Errorf(`store: unable to update tags for entry #%d: %v`, entry.ID, err)
+	}
+	return
+}

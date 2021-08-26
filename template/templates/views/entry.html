@@ -122,6 +122,11 @@
                 {{ plural "entry.estimated_reading_time" .entry.ReadingTime .entry.ReadingTime }}
             </span>
             {{ end }}
+            &centerdot;
+            {{ range .entry.Tags }}
+            <span><a href="{{ route "searchEntries" }}?q=tag%3a{{ . | safeURL }}">{{ . }}</a></span>
+            {{ end }}
+            <a href="{{ route "showEditTagsPage" "entryID" .entry.ID }}">edit</a>
         </div>
     </header>
     {{ if gt (len .entry.Content) 120 }}

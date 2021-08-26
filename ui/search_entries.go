@@ -6,6 +6,7 @@ package ui // import "miniflux.app/ui"
 
 import (
 	"net/http"
+	"strings"
 
 	"miniflux.app/http/request"
 	"miniflux.app/http/response/html"
@@ -15,6 +16,30 @@ import (
 	"miniflux.app/ui/view"
 )
 
+func parseQuery(q string) (string, []string) {
+	tags := []string{}
+	words := []string{}
+	for _, word := range strings.Split(q, " ") {
+		if strings.HasPrefix(word, "tag:") {
+			tags = append(tags, word[len("tag:"):])
+		} else {
+			words = append(words, word)
+		}
+	}
+	return strings.Join(words, " "), tags
+}
+
+func buildQuery(q string, tags []string) string {
+	result := ""
+	if len(tags) > 0 {
+		for _, tag := range tags {
+			result += "tag:" + tag + " "
+		}
+	}
+	result += q
+	return result
+}
+
 func (h *handler) showSearchEntriesPage(w http.ResponseWriter, r *http.Request) {
 	user, err := h.store.UserByID(request.UserID(r))
 	if err != nil {
@@ -22,13 +47,16 @@ func (h *handler) showSearchEntriesPage(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	searchQuery := request.QueryStringParam(r, "q", "")
+	searchQuery, searchTags := parseQuery(request.QueryStringParam(r, "q", ""))
 	offset := request.QueryIntParam(r, "offset", 0)
 	builder := h.store.NewEntryQueryBuilder(user.ID)
 	builder.WithSearchQuery(searchQuery)
 	builder.WithoutStatus(model.EntryStatusRemoved)
 	builder.WithOffset(offset)
 	builder.WithLimit(user.EntriesPerPage)
+	if len(searchTags) > 0 {
+		builder.WithTags(searchTags)
+	}
 
 	entries, err := builder.GetEntries()
 	if err != nil {
@@ -47,7 +75,7 @@ func (h *handler) showSearchEntriesPage(w http.ResponseWriter, r *http.Request) 
 	pagination := getPagination(route.Path(h.router, "searchEntries"), count, offset, user.EntriesPerPage)
 	pagination.SearchQuery = searchQuery
 
-	view.Set("searchQuery", searchQuery)
+	view.Set("searchQuery", buildQuery(searchQuery, searchTags))
 	view.Set("entries", entries)
 	view.Set("total", count)
 	view.Set("pagination", pagination)

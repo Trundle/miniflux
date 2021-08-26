@@ -97,6 +97,9 @@ func (f *funcMap) Map() template.FuncMap {
 		"nonce": func() string {
 			return crypto.GenerateRandomStringHex(16)
 		},
+		"join": func(delimiter string, strs []string) string {
+			return strings.Join(strs, delimiter)
+		},
 
 		// These functions are overrode at runtime after the parsing.
 		"elapsed": func(timezone string, t time.Time) string {
