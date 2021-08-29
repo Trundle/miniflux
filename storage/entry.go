@@ -516,6 +516,44 @@ func (s *Storage) UnshareEntry(userID int64, entryID int64) (err error) {
 	return
 }
 
+func (s *Storage) AllTags(userID int64) ([]model.TagAndWeight, error) {
+	query := `
+		WITH
+		  tags AS (
+			  SELECT
+			  	unnest(tags) AS tag_name, 
+				count(*) AS tag_count
+			  FROM entries 
+			  WHERE user_id=$1
+			  GROUP BY tag_name
+		  ),
+		  minmax AS (
+			  SELECT
+			  	min(tag_count) AS tag_count_min,
+				max(tag_count) AS tag_count_max
+			  FROM tags
+		  )
+		  SELECT
+		  	tag_name, width_bucket(tag_count, tag_count_min, tag_count_max, 9)
+	      FROM tags, minmax
+	`
+	rows, err := s.db.Query(query, userID)
+	if err != nil {
+		err = fmt.Errorf(`store: unable to retrieve all tags for user #%d: %v`, userID, err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	tags := make([]model.TagAndWeight, 0)
+	for rows.Next() {
+		var tag model.TagAndWeight
+		rows.Scan(&tag.Tag, &tag.Weight)
+		tags = append(tags, tag)
+	}
+
+	return tags, nil
+}
+
 func (s *Storage) UpdateTags(entry *model.Entry) (err error) {
 	query := `UPDATE entries SET tags=$1 WHERE id=$2`
 	_, err = s.db.Exec(query, pq.Array(entry.Tags), entry.ID)

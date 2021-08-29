@@ -131,6 +131,9 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	uiRouter.HandleFunc("/sessions", handler.showSessionsPage).Name("sessions").Methods(http.MethodGet)
 	uiRouter.HandleFunc("/sessions/{sessionID}/remove", handler.removeSession).Name("removeSession").Methods(http.MethodPost)
 
+	// Tags
+	uiRouter.HandleFunc("/tags", handler.showTagsPage).Name("tags").Methods(http.MethodGet)
+
 	// API Keys pages.
 	uiRouter.HandleFunc("/keys", handler.showAPIKeysPage).Name("apiKeys").Methods(http.MethodGet)
 	uiRouter.HandleFunc("/keys/{keyID}/remove", handler.removeAPIKey).Name("removeAPIKey").Methods(http.MethodPost)

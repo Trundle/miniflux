@@ -48,3 +48,8 @@ type EntriesStatusUpdateRequest struct {
 	EntryIDs []int64 `json:"entry_ids"`
 	Status   string  `json:"status"`
 }
+
+type TagAndWeight struct {
+	Tag    string `json:"tag"`
+	Weight int64  `json:"weight"`
+}

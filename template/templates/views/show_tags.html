@@ -1,0 +1,9 @@
+{{ define "title"}}Tag cloud{{ end }}
+
+{{ define "content"}}
+<ul class="cloud">
+    {{ range .tags }}
+    <li data-weight="{{ .Weight }}"><a href="{{ route "searchEntries" }}?q=tag%3a{{ .Tag | safeURL }}">{{ .Tag }}</a></li>
+    {{ end }}
+</ul>
+{{ end }}
