@@ -85,6 +85,9 @@
                 <li {{ if eq .menu "tags" }}class="active"{{ end }} title="{{ t "tooltip.keyboard_shortcuts" "g t" }}">
                     <a href="{{ route "tags" }}" data-page="tags">Tags</a>
                 </li>
+                <li {{ if eq .menu "bookmark" }}class="active"{{ end }} title="{{ t "tooltip.keyboard_shortcuts" "g b" }}">
+                    <a href="{{ route "createBookmark" }}" data-page="bookmark">Bookmark</a>
+                </li>
                 <li>
                     <a href="{{ route "logout" }}" title="{{ t "tooltip.logged_user" .user.Username }}">{{ t "menu.logout" }}</a>
                 </li>

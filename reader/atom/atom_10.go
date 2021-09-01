@@ -96,6 +96,7 @@ func (a *atom10Entry) Transform() *model.Entry {
 	entry.Title = a.entryTitle()
 	entry.Enclosures = a.entryEnclosures()
 	entry.CommentsURL = a.entryCommentsURL()
+	entry.Tags = make([]string, 0)
 	return entry
 }
 

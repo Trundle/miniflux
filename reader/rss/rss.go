@@ -179,6 +179,7 @@ func (r *rssItem) Transform() *model.Entry {
 	entry.Content = r.entryContent()
 	entry.Title = r.entryTitle()
 	entry.Enclosures = r.entryEnclosures()
+	entry.Tags = make([]string, 0)
 	return entry
 }
 

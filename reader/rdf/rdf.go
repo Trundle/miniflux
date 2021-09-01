@@ -72,6 +72,7 @@ func (r *rdfItem) Transform() *model.Entry {
 	entry.Content = r.entryContent()
 	entry.Hash = r.entryHash()
 	entry.Date = r.entryDate()
+	entry.Tags = make([]string, 0)
 	return entry
 }
 

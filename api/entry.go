@@ -207,3 +207,26 @@ func configureFilters(builder *storage.EntryQueryBuilder, r *http.Request) {
 		builder.WithSearchQuery(searchQuery)
 	}
 }
+
+func (h *handler) addFeedEntries(w http.ResponseWriter, r *http.Request) {
+	feedID := request.RouteInt64Param(r, "feedID")
+	userID := request.UserID(r)
+
+	if !h.store.FeedExists(userID, feedID) {
+		json.NotFound(w, r)
+		return
+	}
+
+	var entries model.Entries
+	if err := json_parser.NewDecoder(r.Body).Decode(&entries); err != nil {
+		json.BadRequest(w, r, err)
+		return
+	}
+
+	if err := h.store.RefreshFeedEntries(userID, feedID, entries, true); err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	json.NoContent(w, r)
+}

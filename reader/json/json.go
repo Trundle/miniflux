@@ -176,6 +176,7 @@ func (j *jsonItem) Transform() *model.Entry {
 	entry.Content = j.GetContent()
 	entry.Title = strings.TrimSpace(j.GetTitle())
 	entry.Enclosures = j.GetEnclosures()
+	entry.Tags = make([]string, 0)
 	return entry
 }
 

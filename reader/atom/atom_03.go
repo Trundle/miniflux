@@ -90,6 +90,7 @@ func (a *atom03Entry) Transform() *model.Entry {
 	entry.Hash = a.entryHash()
 	entry.Content = a.entryContent()
 	entry.Title = a.entryTitle()
+	entry.Tags = make([]string, 0)
 	return entry
 }
 
