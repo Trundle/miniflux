@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"miniflux.app/config"
 	"miniflux.app/url"
 
 	"golang.org/x/net/html"
@@ -19,7 +20,7 @@ import (
 
 var (
 	youtubeEmbedRegex = regexp.MustCompile(`//www\.youtube\.com/embed/(.*)`)
-	splitSrcsetRegex  = regexp.MustCompile(`,\s+`)
+	splitSrcsetRegex  = regexp.MustCompile(`,\s?`)
 )
 
 // Sanitize returns safe HTML.
@@ -308,7 +309,6 @@ func isBlockedResource(src string) bool {
 
 func isValidIframeSource(baseURL, src string) bool {
 	whitelist := []string{
-		"https://invidio.us",
 		"//www.youtube.com",
 		"http://www.youtube.com",
 		"https://www.youtube.com",
@@ -331,6 +331,11 @@ func isValidIframeSource(baseURL, src string) bool {
 
 	// allow iframe from same origin
 	if url.Domain(baseURL) == url.Domain(src) {
+		return true
+	}
+
+	// allow iframe from custom invidious instance
+	if config.Opts != nil && config.Opts.InvidiousInstance() == url.Domain(src) {
 		return true
 	}
 
@@ -457,13 +462,9 @@ func sanitizeSrcsetAttr(baseURL, value string) string {
 		nbParts := len(parts)
 
 		if nbParts > 0 {
-			sanitizedSource := parts[0]
-			if !strings.HasPrefix(parts[0], "data:") {
-				var err error
-				sanitizedSource, err = url.AbsoluteURL(baseURL, parts[0])
-				if err != nil {
-					continue
-				}
+			sanitizedSource, err := url.AbsoluteURL(baseURL, parts[0])
+			if err != nil {
+				continue
 			}
 
 			if nbParts == 2 && isValidWidthOrDensityDescriptor(parts[1]) {

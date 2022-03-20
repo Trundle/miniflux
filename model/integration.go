@@ -17,6 +17,9 @@ type Integration struct {
 	FeverEnabled         bool
 	FeverUsername        string
 	FeverToken           string
+	GoogleReaderEnabled  bool
+	GoogleReaderUsername string
+	GoogleReaderPassword string
 	WallabagEnabled      bool
 	WallabagURL          string
 	WallabagClientID     string
@@ -29,4 +32,7 @@ type Integration struct {
 	PocketEnabled        bool
 	PocketAccessToken    string
 	PocketConsumerKey    string
+	TelegramBotEnabled   bool
+	TelegramBotToken     string
+	TelegramBotChatID    string
 }

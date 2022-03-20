@@ -11,14 +11,17 @@ import (
 	"regexp"
 	"strings"
 
+	"miniflux.app/config"
+
 	"github.com/PuerkitoBio/goquery"
 )
 
 var (
-	youtubeRegex  = regexp.MustCompile(`youtube\.com/watch\?v=(.*)`)
-	invidioRegex  = regexp.MustCompile(`https?:\/\/(.*)\/watch\?v=(.*)`)
-	imgRegex      = regexp.MustCompile(`<img [^>]+>`)
-	textLinkRegex = regexp.MustCompile(`(?mi)(\bhttps?:\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])`)
+	youtubeRegex   = regexp.MustCompile(`youtube\.com/watch\?v=(.*)`)
+	youtubeIdRegex = regexp.MustCompile(`youtube_id"?\s*[:=]\s*"([a-zA-Z0-9_-]{11})"`)
+	invidioRegex   = regexp.MustCompile(`https?:\/\/(.*)\/watch\?v=(.*)`)
+	imgRegex       = regexp.MustCompile(`<img [^>]+>`)
+	textLinkRegex  = regexp.MustCompile(`(?mi)(\bhttps?:\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])`)
 )
 
 func addImageTitle(entryURL, entryContent string) string {
@@ -100,9 +103,14 @@ func addDynamicImage(entryURL, entryContent string) string {
 		"data-380src",
 	}
 
+	candidateSrcsetAttrs := []string{
+		"data-srcset",
+	}
+
 	changed := false
 
 	doc.Find("img,div").Each(func(i int, img *goquery.Selection) {
+		// Src-linked candidates
 		for _, candidateAttr := range candidateAttrs {
 			if srcAttr, found := img.Attr(candidateAttr); found {
 				changed = true
@@ -112,6 +120,22 @@ func addDynamicImage(entryURL, entryContent string) string {
 				} else {
 					altAttr := img.AttrOr("alt", "")
 					img.ReplaceWithHtml(`<img src="` + srcAttr + `" alt="` + altAttr + `"/>`)
+				}
+
+				break
+			}
+		}
+
+		// Srcset-linked candidates
+		for _, candidateAttr := range candidateSrcsetAttrs {
+			if srcAttr, found := img.Attr(candidateAttr); found {
+				changed = true
+
+				if img.Is("img") {
+					img.SetAttr("srcset", srcAttr)
+				} else {
+					altAttr := img.AttrOr("alt", "")
+					img.ReplaceWithHtml(`<img srcset="` + srcAttr + `" alt="` + altAttr + `"/>`)
 				}
 
 				break
@@ -192,10 +216,27 @@ func addYoutubeVideoUsingInvidiousPlayer(entryURL, entryContent string) string {
 	matches := youtubeRegex.FindStringSubmatch(entryURL)
 
 	if len(matches) == 2 {
-		video := `<iframe width="650" height="350" frameborder="0" src="https://invidio.us/embed/` + matches[1] + `" allowfullscreen></iframe>`
+		video := `<iframe width="650" height="350" frameborder="0" src="https://` + config.Opts.InvidiousInstance() + `/embed/` + matches[1] + `" allowfullscreen></iframe>`
 		return video + `<br>` + entryContent
 	}
 	return entryContent
+}
+
+func addYoutubeVideoFromId(entryContent string) string {
+	matches := youtubeIdRegex.FindAllStringSubmatch(entryContent, -1)
+	if matches == nil {
+		return entryContent
+	}
+	sb := strings.Builder{}
+	for _, match := range matches {
+		if len(match) == 2 {
+			sb.WriteString(`<iframe width="650" height="350" frameborder="0" src="https://www.youtube-nocookie.com/embed/`)
+			sb.WriteString(match[1])
+			sb.WriteString(`" allowfullscreen></iframe><br>`)
+		}
+	}
+	sb.WriteString(entryContent)
+	return sb.String()
 }
 
 func addInvidiousVideo(entryURL, entryContent string) string {
@@ -228,4 +269,22 @@ func replaceCustom(entryContent string, searchTerm string, replaceTerm string) s
 		return re.ReplaceAllString(entryContent, replaceTerm)
 	}
 	return entryContent
+}
+
+func removeCustom(entryContent string, selector string) string {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(entryContent))
+	if err != nil {
+		return entryContent
+	}
+
+	doc.Find(selector).Remove()
+
+	output, _ := doc.Find("body").First().Html()
+	return output
+}
+
+func addCastopodEpisode(entryURL, entryContent string) string {
+	player := `<iframe width="650" frameborder="0" src="` + entryURL + `/embed/light"></iframe>`
+
+	return player + `<br>` + entryContent
 }
