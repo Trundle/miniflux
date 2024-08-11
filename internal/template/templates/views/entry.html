@@ -150,6 +150,11 @@
                 {{ plural "entry.estimated_reading_time" .entry.ReadingTime .entry.ReadingTime }}
             </span>
             {{ end }}
+            &centerdot;
+            {{ range .entry.Tags }}
+            <span><a href="{{ route "tagEntriesAll" "tagName" (urlEncode .) }}">{{ . }}</a></span>
+            {{ end }}
+            <a href="{{ route "showEditTagsPage" "entryID" .entry.ID }}">edit</a>
         </div>
     </header>
 </section>

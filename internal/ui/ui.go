@@ -106,6 +106,8 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	uiRouter.HandleFunc("/entry/download/{entryID}", handler.fetchContent).Name("fetchContent").Methods(http.MethodPost)
 	uiRouter.HandleFunc("/proxy/{encodedDigest}/{encodedURL}", handler.mediaProxy).Name("proxy").Methods(http.MethodGet)
 	uiRouter.HandleFunc("/entry/bookmark/{entryID}", handler.toggleBookmark).Name("toggleBookmark").Methods(http.MethodPost)
+	uiRouter.HandleFunc("/entry/tags/{entryID}/edit", handler.showEditTagsPage).Name("showEditTagsPage").Methods(http.MethodGet)
+	uiRouter.HandleFunc("/entry/tags/{entryID}/update", handler.updateTags).Name("updateTags").Methods(http.MethodPost)
 
 	// Share pages.
 	uiRouter.HandleFunc("/entry/share/{entryID}", handler.createSharedEntry).Name("shareEntry").Methods(http.MethodGet)

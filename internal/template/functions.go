@@ -100,6 +100,9 @@ func (f *funcMap) Map() template.FuncMap {
 		"deRef":     func(i *int) int { return *i },
 		"duration":  duration,
 		"urlEncode": url.PathEscape,
+		"join": func(delimiter string, strs []string) string {
+			return strings.Join(strs, delimiter)
+		},
 
 		// These functions are overrode at runtime after the parsing.
 		"elapsed": func(timezone string, t time.Time) string {
