@@ -1,0 +1,11 @@
+{{ define "title"}}Tag cloud{{ end }}
+
+{{ define "page_header"}}{{ end }}
+
+{{ define "content"}}
+<ul class="cloud">
+    {{ range .tags }}
+    <li data-weight="{{ .Weight }}"><a href="{{ route "tagEntriesAll" "tagName" (urlEncode .Tag) }}">{{ .Tag }}</a></li>
+    {{ end }}
+</ul>
+{{ end }}

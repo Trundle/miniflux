@@ -90,3 +90,8 @@ func (e *EntryUpdateRequest) Patch(entry *Entry) {
 		entry.Content = *e.Content
 	}
 }
+
+type TagAndWeight struct {
+	Tag    string `json:"tag"`
+	Weight int64  `json:"weight"`
+}
