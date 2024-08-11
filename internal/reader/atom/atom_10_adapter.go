@@ -129,14 +129,6 @@ func (a *Atom10Adapter) populateEntries(siteURL string) model.Entries {
 			entry.Date = time.Now()
 		}
 
-		// Populate categories.
-		categories := atomEntry.Categories.CategoryNames()
-		if len(categories) == 0 {
-			categories = a.atomFeed.Categories.CategoryNames()
-		}
-		sort.Strings(categories)
-		entry.Tags = slices.Compact(categories)
-
 		// Populate the commentsURL if defined.
 		// See https://tools.ietf.org/html/rfc4685#section-4
 		// If the type attribute of the atom:link is omitted, its value is assumed to be "application/atom+xml".

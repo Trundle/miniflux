@@ -122,33 +122,6 @@ func (r *RSSAdapter) BuildFeed(baseURL string) *model.Feed {
 			}
 		}
 
-		// Populate entry categories.
-		for _, tag := range item.Categories {
-			if tag != "" {
-				entry.Tags = append(entry.Tags, tag)
-			}
-		}
-		for _, tag := range item.MediaCategories.Labels() {
-			if tag != "" {
-				entry.Tags = append(entry.Tags, tag)
-			}
-		}
-		if len(entry.Tags) == 0 {
-			for _, tag := range r.rss.Channel.Categories {
-				if tag != "" {
-					entry.Tags = append(entry.Tags, tag)
-				}
-			}
-			for _, tag := range r.rss.Channel.GetItunesCategories() {
-				if tag != "" {
-					entry.Tags = append(entry.Tags, tag)
-				}
-			}
-			if r.rss.Channel.GooglePlayCategory.Text != "" {
-				entry.Tags = append(entry.Tags, r.rss.Channel.GooglePlayCategory.Text)
-			}
-		}
-
 		feed.Entries = append(feed.Entries, entry)
 	}
 

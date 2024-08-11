@@ -618,7 +618,7 @@ func removeDuplicates(l []string) []string {
 }
 
 func removeEmpty(l []string) []string {
-	var finalSlice []string
+	finalSlice := make([]string, 0)
 	for _, item := range l {
 		if strings.TrimSpace(item) != "" {
 			finalSlice = append(finalSlice, item)

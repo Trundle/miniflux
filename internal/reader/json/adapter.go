@@ -148,14 +148,6 @@ func (j *JSONAdapter) BuildFeed(baseURL string) *model.Feed {
 			}
 		}
 
-		// Populate the entry tags.
-		for _, tag := range item.Tags {
-			tag = strings.TrimSpace(tag)
-			if tag != "" {
-				entry.Tags = append(entry.Tags, tag)
-			}
-		}
-
 		// Generate a hash for the entry.
 		for _, value := range []string{item.ID, item.URL, item.ContentText + item.ContentHTML + item.Summary} {
 			value = strings.TrimSpace(value)
