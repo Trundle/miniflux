@@ -55,6 +55,8 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	// Bookmark pages.
 	uiRouter.HandleFunc("/starred", handler.showStarredPage).Name("starred").Methods(http.MethodGet)
 	uiRouter.HandleFunc("/starred/entry/{entryID}", handler.showStarredEntryPage).Name("starredEntry").Methods(http.MethodGet)
+	uiRouter.HandleFunc("/starred/create", handler.createStarredEntry).Name("createBookmark").Methods(http.MethodGet)
+	uiRouter.HandleFunc("/starred/create", handler.saveStarredEntry).Name("saveBookmark").Methods(http.MethodPost)
 
 	// Search pages.
 	uiRouter.HandleFunc("/search", handler.showSearchPage).Name("search").Methods(http.MethodGet)

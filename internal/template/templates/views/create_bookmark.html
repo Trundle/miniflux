@@ -1,0 +1,30 @@
+{{ define "title"}}Create new bookmark{{ end }}
+
+{{ define "page_header"}}{{ end }}
+
+{{ define "content"}}
+<h1>Add a new bookmark</h1>
+<form action="{{ route "saveBookmark" }}" method="post" autocomplete="off">
+    <input type="hidden" name="csrf" value="{{ .csrf }}">
+
+    {{ if .errorMessage }}
+        <div class="alert alert-error">{{ t .errorMessage }}</div>
+    {{ end }}
+
+    <label for="form-url">URL</label>
+    <input type="url" name="url" id="form-url" value="{{ .form.URL }}" spellcheck="false" required autofocus>
+
+    <label for="form-title">Title</label>
+    <input type="text" name="title" id="form-title" value="{{ .form.Title }}">
+
+    <label for="form-content">Content</label>
+    <textarea name="content" id="form-content">{{ .form.Content }}</textarea>
+
+    <label for="form-tags">Tags</label>
+    <input type="text" name="tags" id="form-tags" value="{{ .form.Tags | join ", " }}">
+
+    <div class="buttons">
+        <button type="submit" class="button button-primary" data-label-loading="{{ t "form.submit.saving" }}">{{ t "action.save" }}</button> {{ t "action.or" }} <a href="{{ route "starred" }}">{{ t "action.cancel" }}</a>
+    </div>
+</form>
+{{ end }}
