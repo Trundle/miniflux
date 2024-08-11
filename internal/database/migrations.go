@@ -639,7 +639,8 @@ var migrations = []func(tx *sql.Tx) error{
 	},
 	func(tx *sql.Tx) (err error) {
 		_, err = tx.Exec(`
-			ALTER TABLE entries ADD COLUMN tags text[] default '{}';
+			ALTER TABLE entries ADD COLUMN IF NOT EXISTS tags text[] default '{}';
+			CREATE INDEX IF NOT EXISTS entries_tags_idx ON entries USING gin (tags);
 		`)
 		return
 	},
